@@ -8,8 +8,10 @@ BOOST_CHANCE = 1
 MULTIPLIER_CHANCE = 1
 BOOST_DURATION = 10000  # milliseconds (10 seconds)
 MULTIPLIER_DURATION = 10000  # milliseconds (10 seconds)
+GAME_NAME = "Snake of Chaos"
 
 # Colors
+WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 APPLE = (255, 0, 0)
@@ -60,12 +62,29 @@ def check_item_collision(headpos, item_pos):
 def check_for_death(headpos, snake_body):
     return headpos in snake_body[1:]
 
-def main():
-    pygame.init()
+def run_menu(screen):
+    titlefont = pygame.font.Font('freesansbold.ttf', 50)
+    titletext = titlefont.render(GAME_NAME, True, WHITE)
+    titletext_rect = titletext.get_rect(center=(WINDOW_SIZE[0]//2, WINDOW_SIZE[1]//2 - 50))
+    font = pygame.font.Font('freesansbold.ttf', 20)
+    text = font.render("Press 'P' key to start", True, WHITE)
+    text_rect = text.get_rect(center=(WINDOW_SIZE[0]//2, WINDOW_SIZE[1]//2 + 20))
+    screen.fill(BLACK)
+    screen.blit(titletext, titletext_rect)
+    screen.blit(text, text_rect)
+    pygame.display.update()
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    waiting = False
+    return "Play"
 
-    # Screen setup
-    screen = pygame.display.set_mode(WINDOW_SIZE)
-    pygame.display.set_caption("Snake of Chaos") 
+def run_game(screen):
     font = pygame.font.Font('freesansbold.ttf', 20)
 
     # Snake position
@@ -94,13 +113,12 @@ def main():
 
     while True:
         if died == True:
-            text = font.render("Game Over", True, (255,255,255))
+            text = font.render("Game Over", True, WHITE)
             text_rect = text.get_rect(center=(WINDOW_SIZE[0]//2, WINDOW_SIZE[1]//2))
             screen.blit(text, text_rect)
             pygame.display.update()
             pygame.time.wait(2000)
-            pygame.quit()
-            sys.exit()
+            return "Menu"
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -162,16 +180,28 @@ def main():
             pygame.draw.rect(screen, MULTIPLIER, pygame.Rect(multiplier_pos[0], multiplier_pos[1], GRID_SIZE, GRID_SIZE))
         
         #Score text
-        text = font.render("Score: "+ str(score), True, (255,255,255))
+        text = font.render("Score: "+ str(score), True, WHITE)
         screen.blit(text,[0,0])
         if boost_time_remaining > 0:
-            text = font.render("x"+str(current_speed)+" Boost time: "+ str(boost_time_remaining//1000), True, (255,255,255))
+            text = font.render("x"+str(current_speed)+" Boost time: "+ str(boost_time_remaining//1000), True, WHITE)
             screen.blit(text,[WINDOW_SIZE[0] - text.get_width(),0])
         if multiplier_time_remaining > 0:
-            text = font.render("x"+str(current_multiplier)+" Multiplier time: "+ str(multiplier_time_remaining//1000), True, (255,255,255))
+            text = font.render("x"+str(current_multiplier)+" Multiplier time: "+ str(multiplier_time_remaining//1000), True, WHITE)
             screen.blit(text,[WINDOW_SIZE[0] - text.get_width(),text.get_height()])
 
         pygame.display.update()
         clock.tick(current_speed)
 
+def main():
+    pygame.init()
+    # Screen setup
+    screen = pygame.display.set_mode(WINDOW_SIZE)
+    pygame.display.set_caption(GAME_NAME)
+    state = "Menu"
+    while True:
+        pygame.display.update()
+        if state == "Menu" or state == "Dead":
+            state = run_menu(screen)
+        elif state == "Play":
+            state = run_game(screen)
 main()
