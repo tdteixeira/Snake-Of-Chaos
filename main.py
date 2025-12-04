@@ -4,7 +4,7 @@ import random
 import math
 
 WINDOW_SIZE = (600, 400)
-GRID_SELECTOR = 10
+GRID_SELECTOR = 5
 BOOST_CHANCE = 1
 MULTIPLIER_CHANCE = 1
 BOOST_DURATION = 10000  # milliseconds (10 seconds)

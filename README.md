@@ -49,7 +49,7 @@ The faster you go, the more opportunities appear... but can you survive the chao
 ## ⚙️ Customization
 
 Edit constants in `main.py`:
-- `GRID_SIZE`: Change snake/item size (default: 20)
+- `GRID_SELECTOR`: Change snake/item size (default: 5)
 - `WINDOW_SIZE`: Adjust game window dimensions
 - `BOOST_CHANCE` / `MULTIPLIER_CHANCE`: Control spawn rates (default: 1%)
 - `BOOST_DURATION` / `MULTIPLIER_DURATION`: Adjust effect timers (default: 10s)
