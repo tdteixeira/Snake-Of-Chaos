@@ -1,9 +1,10 @@
 import pygame
 import sys
 import random
+import math
 
 WINDOW_SIZE = (600, 400)
-GRID_SIZE = 20
+GRID_SELECTOR = 10
 BOOST_CHANCE = 1
 MULTIPLIER_CHANCE = 1
 BOOST_DURATION = 10000  # milliseconds (10 seconds)
@@ -18,10 +19,19 @@ APPLE = (255, 0, 0)
 BOOST = (0, 0, 255)
 MULTIPLIER = (255,255,0)
 
+def get_all_common_divisors(width, height):
+    mdc = math.gcd(width, height)
+    divs = set()
+    for i in range(1, int(math.sqrt(mdc)) + 1):
+        if mdc % i == 0:
+            divs.add(i)
+            divs.add(mdc // i)
+    return sorted(divs)
+
 def generate_random_position():
-    max_x = (WINDOW_SIZE[0] // GRID_SIZE) - 1
-    max_y = (WINDOW_SIZE[1] // GRID_SIZE) - 1
-    return [random.randint(0, max_x) * GRID_SIZE, random.randint(0, max_y) * GRID_SIZE]
+    max_x = (WINDOW_SIZE[0] // grid_size) - 1
+    max_y = (WINDOW_SIZE[1] // grid_size) - 1
+    return [random.randint(0, max_x) * grid_size, random.randint(0, max_y) * grid_size]
 
 def get_moveDir(event,moveDir):
     movDir=moveDir
@@ -38,15 +48,15 @@ def get_moveDir(event,moveDir):
 def move_snake(snake_body, moveDir):
     if moveDir != [0,0]:
         headpos=snake_body[0].copy()
-        headpos[0] += moveDir[0] * GRID_SIZE
-        headpos[1] += moveDir[1] * GRID_SIZE
+        headpos[0] += moveDir[0] * grid_size
+        headpos[1] += moveDir[1] * grid_size
         if headpos[0] < 0:
-            headpos[0] = WINDOW_SIZE[0]-GRID_SIZE
-        elif headpos[0] > WINDOW_SIZE[0]-GRID_SIZE:
+            headpos[0] = WINDOW_SIZE[0]-grid_size
+        elif headpos[0] > WINDOW_SIZE[0]-grid_size:
             headpos[0] = 0
         elif headpos[1] < 0:
-            headpos[1] = WINDOW_SIZE[1]-GRID_SIZE
-        elif headpos[1] > WINDOW_SIZE[1]-GRID_SIZE:
+            headpos[1] = WINDOW_SIZE[1]-grid_size
+        elif headpos[1] > WINDOW_SIZE[1]-grid_size:
             headpos[1] = 0
         for i in range(len(snake_body)-1,0,-1):
             snake_body[i]=snake_body[i-1]
@@ -88,8 +98,8 @@ def run_game(screen):
     font = pygame.font.Font('freesansbold.ttf', 20)
 
     # Snake position
-    init_snake_head = [2*GRID_SIZE, 3*GRID_SIZE]
-    snake_body = [init_snake_head, [init_snake_head[0]-GRID_SIZE, init_snake_head[1]], [init_snake_head[0]-2*GRID_SIZE, init_snake_head[1]]]
+    init_snake_head = [2*grid_size, 3*grid_size]
+    snake_body = [init_snake_head, [init_snake_head[0]-grid_size, init_snake_head[1]], [init_snake_head[0]-2*grid_size, init_snake_head[1]]]
     #Movement related
     pending_moveDir = [0,1]
     moveDir = [0,1]
@@ -172,12 +182,12 @@ def run_game(screen):
         #Visuals
         screen.fill(BLACK)
         for pos in snake_body:
-            pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], GRID_SIZE, GRID_SIZE))
-        pygame.draw.rect(screen, APPLE, pygame.Rect(apple_pos[0], apple_pos[1], GRID_SIZE, GRID_SIZE))
+            pygame.draw.rect(screen, GREEN, pygame.Rect(pos[0], pos[1], grid_size, grid_size))
+        pygame.draw.rect(screen, APPLE, pygame.Rect(apple_pos[0], apple_pos[1], grid_size, grid_size))
         if boost_pos is not None:
-            pygame.draw.rect(screen, BOOST, pygame.Rect(boost_pos[0], boost_pos[1], GRID_SIZE, GRID_SIZE))
+            pygame.draw.rect(screen, BOOST, pygame.Rect(boost_pos[0], boost_pos[1], grid_size, grid_size))
         if multiplier_pos is not None:
-            pygame.draw.rect(screen, MULTIPLIER, pygame.Rect(multiplier_pos[0], multiplier_pos[1], GRID_SIZE, GRID_SIZE))
+            pygame.draw.rect(screen, MULTIPLIER, pygame.Rect(multiplier_pos[0], multiplier_pos[1], grid_size, grid_size))
         
         #Score text
         text = font.render("Score: "+ str(score), True, WHITE)
@@ -193,6 +203,9 @@ def run_game(screen):
         clock.tick(current_speed)
 
 def main():
+    divs = get_all_common_divisors(WINDOW_SIZE[0], WINDOW_SIZE[1])
+    global grid_size
+    grid_size = divs[GRID_SELECTOR]
     pygame.init()
     # Screen setup
     screen = pygame.display.set_mode(WINDOW_SIZE)
